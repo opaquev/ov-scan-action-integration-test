@@ -1,5 +1,15 @@
-# Fixture credentials. ALL prefixed with XXXFAKE_ per the action's safe
-# convention. These are NOT real credentials.
+# Fixture credentials. These use AWS's published documentation
+# example values, which are well-known fakes:
+# https://docs.aws.amazon.com/IAM/latest/UserGuide/security-creds.html
+#
+# - GitHub's secret-scanning push-protection allowlists these by design.
+# - AWS rejects them on any API call (they don't validate against IAM).
+# - `ov scan`'s aws-access-key + aws-secret-key + high-entropy detectors
+#   match them, which is the point of this fixture.
+#
+# DO NOT replace these with real-looking-but-fake values invented for
+# this repo. The published AWS docs example is the only safe known
+# fake-that-still-detects pattern.
 
-AWS_ACCESS_KEY_ID=XXXFAKE_AKIA_DEADBEEFCAFE0123456789ABCDEF0123
-AWS_SECRET_ACCESS_KEY=XXXFAKE_wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
