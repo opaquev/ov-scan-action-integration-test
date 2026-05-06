@@ -1,0 +1,5 @@
+# Fixture credentials. ALL prefixed with XXXFAKE_ per the action's safe
+# convention. These are NOT real credentials.
+
+AWS_ACCESS_KEY_ID=XXXFAKE_AKIA_DEADBEEFCAFE0123456789ABCDEF0123
+AWS_SECRET_ACCESS_KEY=XXXFAKE_wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
