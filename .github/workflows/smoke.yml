@@ -42,6 +42,13 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
+        # OV-256: ov scan v0.10.0 segfaults on linux_arm64. Excluded
+        # from clean/dirty smoke until ov ships a v0.10.2 fix and
+        # ov-scan-action bumps OV_VERSION. version-floor cells stay
+        # on arm because they don't invoke `ov scan` and validate
+        # that the arch matrix logic itself works.
+        exclude:
+          - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11   # v4.1.1, SHA-pinned
@@ -88,6 +95,10 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
+        # OV-256: same arm64 segfault as clean-repo. Excluded until
+        # ov fixes the linux_arm64 binary.
+        exclude:
+          - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11   # v4.1.1

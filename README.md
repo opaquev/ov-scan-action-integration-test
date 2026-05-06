@@ -34,7 +34,7 @@ This repo only catches **(consume-from-marketplace correctness)**. The action's 
 
 Each variant runs on:
 - `ubuntu-latest` (linux_amd64)
-- `ubuntu-24.04-arm` (linux_arm64)
+- `ubuntu-24.04-arm` (linux_arm64) — currently **excluded from clean/dirty** pending [OV-256](https://linear.app/thehunterfoundry/issue/OV-256). The v0.10.0 `ov` binary segfaults on linux_arm64 (`exit 139`, "Segmentation fault (core dumped)"). The action's fail-closed parsing fires correctly, but the segfault means we can't validate `ov scan` happy paths there until OV-256 ships. The arm runner stays in the `version-floor` matrix because that variant validates the action's arch-matrix logic without invoking `ov scan` itself.
 - `macos-latest` (darwin_arm64)
 
 Each variant also runs in two pin modes:
