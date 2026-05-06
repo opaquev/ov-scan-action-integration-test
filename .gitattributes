@@ -1,0 +1,3 @@
+# Lock line endings to LF so fixtures don't get CRLF-mangled on Windows
+# clones. The action repo's own `.gitattributes` enforces the same.
+* text=auto eol=lf
