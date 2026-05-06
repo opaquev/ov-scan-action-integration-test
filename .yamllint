@@ -1,0 +1,10 @@
+# yamllint config for ov-scan-action-integration-test
+# Same shape as the upstream opaquev/ov-scan-action repo.
+extends: default
+
+rules:
+  line-length: disable
+  document-start: disable
+  truthy:
+    check-keys: false
+  colons: disable

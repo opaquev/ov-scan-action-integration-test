@@ -23,7 +23,9 @@ permissions:
   contents: read
   issues: write   # required for issue-on-failure; nothing else
 
-# v1.0.0 SHA pin: c1b559d4310a140e27306ed2d73ec90621b0954d
+# v1.0.1 SHA pin: e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+# (was v1.0.0: c1b559d4310a140e27306ed2d73ec90621b0954d — bumped 2026-05-06
+# after the smoke caught a baseline-default UX bug in v1.0.0.)
 # Verified: `git ls-remote https://github.com/opaquev/ov-scan-action refs/tags/v1.0.0^{}`
 #
 # The action is referenced literally in `uses:` lines below (since
@@ -55,7 +57,7 @@ jobs:
       - name: Run ov-scan-action (SHA-pinned to v1.0.0)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@c1b559d4310a140e27306ed2d73ec90621b0954d
+        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
         with:
           path: fixtures/clean-repo
           fail-on: high
@@ -102,7 +104,7 @@ jobs:
       - name: Run ov-scan-action (SHA-pinned to v1.0.0)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@c1b559d4310a140e27306ed2d73ec90621b0954d
+        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
         with:
           path: fixtures/dirty-repo
           fail-on: high
@@ -155,7 +157,7 @@ jobs:
       - name: Run ov-scan-action with impossibly-high min-ov-version (SHA pin)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@c1b559d4310a140e27306ed2d73ec90621b0954d
+        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
         with:
           path: fixtures/clean-repo
           min-ov-version: v999.0.0
