@@ -23,11 +23,14 @@ permissions:
   contents: read
   issues: write   # required for issue-on-failure; nothing else
 
-# v1.0.0 immutable SHA. Bump this in lockstep with the @v1 floating tag
-# every time a new ov-scan-action release ships. The two-job matrix
-# below catches divergence between them.
-env:
-  OV_SCAN_ACTION_V1_SHA: c1b559d4310a140e27306ed2d73ec90621b0954d
+# v1.0.0 SHA pin: c1b559d4310a140e27306ed2d73ec90621b0954d
+# Verified: `git ls-remote https://github.com/opaquev/ov-scan-action refs/tags/v1.0.0^{}`
+#
+# The action is referenced literally in `uses:` lines below (since
+# `uses:` does NOT expand env vars or `${{ }}` expressions, the SHA
+# must be inline). Bump in lockstep with the @v1 floating tag every
+# time a new ov-scan-action release ships. The two-pin matrix below
+# catches divergence between them.
 
 jobs:
   clean-repo:
@@ -192,6 +195,25 @@ jobs:
             const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
             const today = new Date().toISOString().split('T')[0];
             const title = `smoke failed on ${today}`;
+
+            // Ensure the label exists. GitHub silently drops unknown
+            // labels on issue creation, so without this step the
+            // de-dup query would never converge — every failure would
+            // open a fresh issue. Senior-SWE review caught this on
+            // PR #1.
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: 'smoke-failure' });
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner, repo, name: 'smoke-failure',
+                  color: 'd73a4a',
+                  description: 'Daily smoke test failure',
+                });
+              } else {
+                throw e;
+              }
+            }
 
             const existing = await github.rest.issues.listForRepo({
               owner, repo, state: 'open', labels: 'smoke-failure',
