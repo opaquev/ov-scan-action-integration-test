@@ -8,14 +8,14 @@ Daily integration smoke test of the published [`opaquev/ov-scan-action`](https:/
 
 ## What this is
 
-A separate consumer repo that pins `opaquev/ov-scan-action@v1` (and a parallel job pinning the immutable `v1.0.0` SHA) and runs the action against real fixtures on a daily cron + on every push to `main`.
+A separate consumer repo that pins `opaquev/ov-scan-action@v1` (and a parallel job pinning the immutable `v1.0.2` SHA) and runs the action against real fixtures on a daily cron + on every push to `main`.
 
 It catches failure modes that pre-merge CI in the action repo can't:
 
 | Failure mode | Caught by |
 |---|---|
 | The `@v1` floating tag points at a broken SHA | This repo |
-| The `v1.0.0` SHA-pin works but `@v1` was force-moved | This repo (compares both jobs) |
+| The `v1.0.2` SHA-pin works but `@v1` was force-moved | This repo (compares both jobs) |
 | `releases.opaquevault.com/v0.10.0/` returns 404 (CDN dropped the artifact) | This repo |
 | jedisct1 minisign release artifacts changed | This repo |
 | GitHub Actions runner image drift breaks bash 3.2 / coreutils assumptions | This repo |
@@ -34,12 +34,12 @@ This repo only catches **(consume-from-marketplace correctness)**. The action's 
 
 Each variant runs on:
 - `ubuntu-latest` (linux_amd64)
-- `ubuntu-24.04-arm` (linux_arm64) — currently **excluded from clean/dirty** pending [OV-256](https://linear.app/thehunterfoundry/issue/OV-256). The v0.10.0 `ov` binary segfaults on linux_arm64 (`exit 139`, "Segmentation fault (core dumped)"). The action's fail-closed parsing fires correctly, but the segfault means we can't validate `ov scan` happy paths there until OV-256 ships. The arm runner stays in the `version-floor` matrix because that variant validates the action's arch-matrix logic without invoking `ov scan` itself.
+- `ubuntu-24.04-arm` (linux_arm64) — fully covered as of v1.0.2. [OV-256](https://linear.app/thehunterfoundry/issue/OV-256) was an action-side bug (the default `memory-budget` of 1 GiB was below the Go runtime's ~2 GiB virtual-address-space floor on linux_arm64, causing `ov` to segfault during `runtime.(*mheap).init` before `main()` ran); v1.0.2 raises the default to 4 GiB and adds bats contract #46 as a regression guard.
 - `macos-latest` (darwin_arm64)
 
 Each variant also runs in two pin modes:
 - `@v1` (floating tag — what most casual users will use)
-- `@<v1.0.0-sha>` (immutable SHA pin — the recommended production pattern)
+- `@<v1.0.2-sha>` (immutable SHA pin — the recommended production pattern)
 
 ## Schedule
 
@@ -76,10 +76,10 @@ This repo:
 - Does NOT pin `actions/checkout@v4` — it pins to a SHA per the action repo's own SHA-pinning gospel
 - Does NOT receive any secrets — the smoke workflow runs with `permissions: contents: read` only
 
-If this repo is compromised, the worst an attacker can do is hide a smoke failure (false-green). They cannot inject a malicious `ov-scan-action` because the SHA-pinned job is the source of truth — a forged `v1.0.0` SHA would fail with "tag does not match expected commit" via GitHub's resolver.
+If this repo is compromised, the worst an attacker can do is hide a smoke failure (false-green). They cannot inject a malicious `ov-scan-action` because the SHA-pinned job is the source of truth — a forged `v1.0.2` SHA would fail with "tag does not match expected commit" via GitHub's resolver.
 
 ## See also
 
 - [`opaquev/ov-scan-action`](https://github.com/opaquev/ov-scan-action) — the action being tested
-- Action's [v1.0.0 release](https://github.com/opaquev/ov-scan-action/releases/tag/v1.0.0)
+- Action's [v1.0.2 release](https://github.com/opaquev/ov-scan-action/releases/tag/v1.0.2)
 - Action's [threat model](https://github.com/opaquev/ov-scan-action/blob/main/docs/threat-model.md)

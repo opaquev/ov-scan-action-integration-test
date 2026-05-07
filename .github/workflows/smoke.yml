@@ -23,10 +23,14 @@ permissions:
   contents: read
   issues: write   # required for issue-on-failure; nothing else
 
-# v1.0.1 SHA pin: e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
-# (was v1.0.0: c1b559d4310a140e27306ed2d73ec90621b0954d — bumped 2026-05-06
-# after the smoke caught a baseline-default UX bug in v1.0.0.)
-# Verified: `git ls-remote https://github.com/opaquev/ov-scan-action refs/tags/v1.0.0^{}`
+# v1.0.2 SHA pin: 98c39a402992bbae3528af9868bba3045c5f4536
+# Release history:
+#   v1.0.2 — 2026-05-06: OV-256 fix, ov scan no longer segfaults on linux_arm64
+#                        (memory-budget default 1 GiB → 4 GiB to clear Go runtime floor)
+#   v1.0.1 — 2026-05-06: e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+#                        (smoke caught baseline-default UX bug in v1.0.0)
+#   v1.0.0 — 2026-05-06: c1b559d4310a140e27306ed2d73ec90621b0954d (initial GA)
+# Verified: `git ls-remote https://github.com/opaquev/ov-scan-action refs/tags/v1.0.2^{}`
 #
 # The action is referenced literally in `uses:` lines below (since
 # `uses:` does NOT expand env vars or `${{ }}` expressions, the SHA
@@ -42,13 +46,6 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
-        # OV-256: ov scan v0.10.0 segfaults on linux_arm64. Excluded
-        # from clean/dirty smoke until ov ships a v0.10.2 fix and
-        # ov-scan-action bumps OV_VERSION. version-floor cells stay
-        # on arm because they don't invoke `ov scan` and validate
-        # that the arch matrix logic itself works.
-        exclude:
-          - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11   # v4.1.1, SHA-pinned
@@ -61,10 +58,10 @@ jobs:
           path: fixtures/clean-repo
           fail-on: high
 
-      - name: Run ov-scan-action (SHA-pinned to v1.0.0)
+      - name: Run ov-scan-action (SHA-pinned to v1.0.2)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@98c39a402992bbae3528af9868bba3045c5f4536
         with:
           path: fixtures/clean-repo
           fail-on: high
@@ -95,10 +92,6 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
-        # OV-256: same arm64 segfault as clean-repo. Excluded until
-        # ov fixes the linux_arm64 binary.
-        exclude:
-          - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11   # v4.1.1
@@ -112,10 +105,10 @@ jobs:
           fail-on: high
         continue-on-error: true   # we EXPECT non-zero exit
 
-      - name: Run ov-scan-action (SHA-pinned to v1.0.0)
+      - name: Run ov-scan-action (SHA-pinned to v1.0.2)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@98c39a402992bbae3528af9868bba3045c5f4536
         with:
           path: fixtures/dirty-repo
           fail-on: high
@@ -168,7 +161,7 @@ jobs:
       - name: Run ov-scan-action with impossibly-high min-ov-version (SHA pin)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@98c39a402992bbae3528af9868bba3045c5f4536
         with:
           path: fixtures/clean-repo
           min-ov-version: v999.0.0
