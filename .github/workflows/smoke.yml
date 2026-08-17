@@ -35,7 +35,8 @@ permissions:
 # `uses:` does NOT expand env vars or `${{ }}` expressions, the SHA
 # must be inline). Bump in lockstep with the @v1 floating tag every
 # time a new ov-scan-action release ships. The two-pin matrix below
-# catches divergence between them.
+# catches divergence between them. OV-404 tracks automating this bump
+# (release-triggered PR) so the pin can't silently go stale again.
 
 jobs:
   clean-repo:
@@ -45,11 +46,15 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
-        # OV-256: ov scan v0.10.0 segfaults on linux_arm64. Excluded
-        # from clean/dirty smoke until ov ships a v0.10.2 fix and
-        # ov-scan-action bumps OV_VERSION. version-floor cells stay
-        # on arm because they don't invoke `ov scan` and validate
-        # that the arch matrix logic itself works.
+        # OV-256: the linux_arm64 segfault was the action's own
+        # pre-v1.0.2 memory-budget default (1 GiB ulimit -v, below the
+        # ~2 GiB of VA space the Go runtime needs on arm64). v1.0.2
+        # raised the default to 4 GiB and both pinned refs include the
+        # fix — excluded only until a green arm validation run confirms
+        # it (workflow_dispatch with these excludes removed), then
+        # delete the excludes. version-floor cells stay on arm because
+        # they don't invoke `ov scan` and validate that the arch
+        # matrix logic itself works.
         exclude:
           - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
@@ -98,8 +103,8 @@ jobs:
       matrix:
         runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
         pin: [v1, sha]
-        # OV-256: same arm64 segfault as clean-repo. Excluded until
-        # ov fixes the linux_arm64 binary.
+        # OV-256: same as clean-repo — excluded until a green arm
+        # validation run confirms the v1.0.2 memory-budget fix.
         exclude:
           - runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
