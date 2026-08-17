@@ -4,8 +4,8 @@ name: smoke
 #
 # Runs the action against in-tree fixtures on every push, every day at
 # 12:00 UTC, and on manual dispatch. Validates BOTH the floating @v1
-# tag AND the SHA pin to v1.0.0 — if they ever diverge in behavior,
-# the smoke job fails and an issue is opened in this repo.
+# tag AND the SHA pin to the current release — if they ever diverge in
+# behavior, the smoke job fails and an issue is opened in this repo.
 #
 # Workflow-injection hardening: no `${{ }}` template expressions inside
 # any `run:` block. All inputs are bound to env vars at step scope.
@@ -23,10 +23,13 @@ permissions:
   contents: read
   issues: write   # required for issue-on-failure; nothing else
 
-# v1.0.1 SHA pin: e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
-# (was v1.0.0: c1b559d4310a140e27306ed2d73ec90621b0954d — bumped 2026-05-06
+# v1.0.3 SHA pin: 20f4875e4641fcaa34fc2403d8dfaab13669fd8e
+# (was v1.0.1: e91af746370e5e4b6a53e3a9a3675243cf1cbcb4 — bumped 2026-08-17
+# after the pin sat un-bumped through v1.0.2 and v1.0.3, leaving the
+# current release with zero SHA-pinned smoke coverage; OV-401.
+# was v1.0.0: c1b559d4310a140e27306ed2d73ec90621b0954d — bumped 2026-05-06
 # after the smoke caught a baseline-default UX bug in v1.0.0.)
-# Verified: `git ls-remote https://github.com/opaquev/ov-scan-action refs/tags/v1.0.0^{}`
+# Verified: `git ls-remote https://github.com/opaquev/ov-scan-action 'refs/tags/v1.0.3^{}'`
 #
 # The action is referenced literally in `uses:` lines below (since
 # `uses:` does NOT expand env vars or `${{ }}` expressions, the SHA
@@ -61,10 +64,10 @@ jobs:
           path: fixtures/clean-repo
           fail-on: high
 
-      - name: Run ov-scan-action (SHA-pinned to v1.0.0)
+      - name: Run ov-scan-action (SHA-pinned to v1.0.3)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@20f4875e4641fcaa34fc2403d8dfaab13669fd8e
         with:
           path: fixtures/clean-repo
           fail-on: high
@@ -112,10 +115,10 @@ jobs:
           fail-on: high
         continue-on-error: true   # we EXPECT non-zero exit
 
-      - name: Run ov-scan-action (SHA-pinned to v1.0.0)
+      - name: Run ov-scan-action (SHA-pinned to v1.0.3)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@20f4875e4641fcaa34fc2403d8dfaab13669fd8e
         with:
           path: fixtures/dirty-repo
           fail-on: high
@@ -168,7 +171,7 @@ jobs:
       - name: Run ov-scan-action with impossibly-high min-ov-version (SHA pin)
         if: matrix.pin == 'sha'
         id: scan-sha
-        uses: opaquev/ov-scan-action@e91af746370e5e4b6a53e3a9a3675243cf1cbcb4
+        uses: opaquev/ov-scan-action@20f4875e4641fcaa34fc2403d8dfaab13669fd8e
         with:
           path: fixtures/clean-repo
           min-ov-version: v999.0.0
